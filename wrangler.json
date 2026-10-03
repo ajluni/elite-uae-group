@@ -1,0 +1,21 @@
+{
+  "name": "elite-uae-group",
+  "account_id": "b14aed6232dff3768f02420923ed196c",
+  "compatibility_date": "2026-09-29",
+  "assets": {
+    "directory": "./public"
+  },
+  "keep_vars": true,
+  "routes": [
+    {
+      "pattern": "eliteuaegroup.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "eliteuaegroup.ae",
+      "custom_domain": true
+    }
+  ],
+  "workers_dev": true,
+  "preview_urls": true
+}
