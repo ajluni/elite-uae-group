@@ -1,0 +1,12 @@
+.DS_Store
+backup/
+backup-*/
+backup-current-*/
+backup-email-*/
+backup-language-*/
+node_modules/
+.wrangler/
+.dev.vars
+.env
+.env.*
+*.log
