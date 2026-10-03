@@ -5,12 +5,12 @@ Produktionsquelle für **eliteuaegroup.ae** und **eliteuaegroup.com**.
 ## Struktur
 - `public/` – veröffentlichte Website
 - `wrangler.json` – Cloudflare-Konfiguration
-- `.github/workflows/deploy.yml` – automatische Veröffentlichung nach Änderungen auf `main`
 
 ## Veröffentlichung
-Lokal:
-`npx wrangler deploy --config wrangler.json`
+Die Website ist direkt mit **Cloudflare Workers Builds** und dem GitHub-Repository `ajluni/elite-uae-group` verbunden.
 
-Automatisch über GitHub:
-Benötigt einmalig das Repository-Secret `CLOUDFLARE_API_TOKEN`.
-Danach wird jeder Push auf `main` automatisch zu Cloudflare veröffentlicht.
+- Produktionszweig: `main`
+- Änderungen auf `main` stoßen automatisch einen Cloudflare-Build und eine Veröffentlichung an.
+- Lokal bleibt eine manuelle Veröffentlichung mit `npx wrangler deploy --config wrangler.json` möglich.
+
+Es wird kein separates GitHub-Actions-Secret für Cloudflare benötigt.
