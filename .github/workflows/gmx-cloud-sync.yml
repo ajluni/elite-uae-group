@@ -1,6 +1,9 @@
 name: GMX Cloud Sync
 
 on:
+  push:
+    paths:
+      - ".github/workflows/gmx-cloud-sync.yml"
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
