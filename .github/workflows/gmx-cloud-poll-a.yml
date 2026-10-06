@@ -1,6 +1,9 @@
 name: GMX Cloud Poll
 
 on:
+  push:
+    paths:
+      - '.github/workflows/gmx-cloud-poll-a.yml'
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -22,5 +25,5 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TOKEN="$(curl -fsS             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN"             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=gmx-cloud-cron"             | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
-          curl -fsS             -H "Authorization: Bearer $TOKEN"             "https://gmx-cloud-cron.vercel.app/api/run-bcc39920fe2c96e042feab18"
+          TOKEN="$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=gmx-cloud-cron" | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
+          curl -fsS -H "Authorization: Bearer $TOKEN" "https://gmx-cloud-cron.vercel.app/api/run-bcc39920fe2c96e042feab18"
