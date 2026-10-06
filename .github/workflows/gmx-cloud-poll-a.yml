@@ -1,16 +1,17 @@
-name: GMX Cloud Poll A
+name: GMX Cloud Poll
 
 on:
   schedule:
-    - cron: '1,7,13,19,25,31,37,43,49,55 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/gmx-cloud-poll-a.yml'
 
 permissions:
   contents: read
   id-token: write
+
+concurrency:
+  group: gmx-cloud-sync
+  cancel-in-progress: false
 
 jobs:
   trigger-gmx-sync:
