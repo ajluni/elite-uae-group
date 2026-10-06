@@ -25,5 +25,54 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TOKEN="$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=gmx-cloud-cron" | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
-          curl -fsS -H "Authorization: Bearer $TOKEN" "https://gmx-cloud-cron.vercel.app/api/run-bcc39920fe2c96e042feab18"
+
+          TOKEN="$(curl -fsS             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN"             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=gmx-cloud-cron"             | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
+
+          URL="https://gmx-cloud-cron.vercel.app/api/run-bcc39920fe2c96e042feab18"
+          RESPONSE=""
+          HTTP_CODE=""
+
+          for attempt in 1 2 3 4; do
+            TMP_BODY="$(mktemp)"
+            set +e
+            HTTP_CODE="$(curl               --silent               --show-error               --output "$TMP_BODY"               --write-out "%{http_code}"               --connect-timeout 10               --max-time 45               -H "Authorization: Bearer $TOKEN"               "$URL")"
+            CURL_EXIT=$?
+            set -e
+
+            RESPONSE="$(cat "$TMP_BODY")"
+            rm -f "$TMP_BODY"
+
+            if [ "$CURL_EXIT" -eq 0 ] && [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+              break
+            fi
+
+            if [ "$HTTP_CODE" -ge 400 ] && [ "$HTTP_CODE" -lt 500 ]; then
+              echo "Nicht wiederholbarer HTTP-Fehler $HTTP_CODE"
+              printf '%s\n' "$RESPONSE"
+              exit 1
+            fi
+
+            if [ "$attempt" -eq 4 ]; then
+              echo "GMX-Cloud-Sync nach 4 Versuchen fehlgeschlagen (curl=$CURL_EXIT, HTTP=$HTTP_CODE)"
+              printf '%s\n' "$RESPONSE"
+              exit 1
+            fi
+
+            sleep $((attempt * 3))
+          done
+
+          printf '%s\n' "$RESPONSE"
+
+          printf '%s' "$RESPONSE" | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)
+          if data.get("ok") is not True:
+              raise SystemExit("Bridge meldet ok:true nicht")
+          remaining = data.get("remaining")
+          last_uid = data.get("lastUid")
+          max_uid = data.get("maxUid")
+          if remaining not in (None, 0) and last_uid != max_uid:
+              raise SystemExit(
+                  f"Bridge hat noch Rückstand: remaining={remaining}, lastUid={last_uid}, maxUid={max_uid}"
+              )
+          '
