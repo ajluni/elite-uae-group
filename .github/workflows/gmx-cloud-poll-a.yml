@@ -1,11 +1,8 @@
 name: GMX Cloud Poll
 
 on:
-  push:
-    paths:
-      - '.github/workflows/gmx-cloud-poll-a.yml'
-  schedule:
-    - cron: '*/5 * * * *'
+  # Automatische Starts vorübergehend ausgeschaltet: wiederholte 502-Fehler am 2026-10-10.
+  # Manueller Test bleibt ausdrücklich möglich; nach bestandener Live-Verifikation Schedule wiederherstellen.
   workflow_dispatch:
 
 permissions:
